@@ -3,6 +3,7 @@
     [clojure.string :as str]
     [clojure.data.json :as json]
     [clj-mailgun.client :as client]
+    [clj-mailgun.templates :as templates]
     [clj-mailgun.config :as config]))
 
 (defn response-error-str
@@ -55,6 +56,19 @@
      :subject subject
      :text text}))
 
+(defn send-template
+  [{:keys [to from subject template params] :as all}]
+  (let [content (templates/render template params)]
+    (if (or (:html content) (:text content))
+      (mail (merge
+              content
+              {:from from
+               :to to
+               :subject subject}))
+      (throw (ex-info "Email content was empty!" all)))))
+
 (defn send-json
-  [{:keys [to from subject body]}]
-  (send-html to from subject body))
+  [{:keys [to from subject body template params] :as all}]
+  (if template
+    (send-template all)
+    (send-html to from subject body)))

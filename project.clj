@@ -8,7 +8,9 @@
      [environ "1.1.0"]
      [org.clojure/data.json "0.2.6"]
      [org.clojure/tools.cli "0.3.5"]
-     [http-kit "2.2.0"]]
+     [http-kit "2.2.0"]
+     [de.ubercode.clostache/clostache "1.4.0"]]
   :main ^:skip-aot clj-mailgun.core
+  :resource-paths ["resources"]
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}})
