@@ -1,6 +1,6 @@
 # clj-mailgun
 
-Simple command line tool to send json emails via Mailgun
+Simple service emails via Mailgun
 
 ## Installation
 
@@ -23,8 +23,22 @@ Simple command line tool to send json emails via Mailgun
 - `MAILGUN_API_KEY` API Key
 - `MAILGUN_API_DOMAIN` Mailgun Domain
 
+### Environment Variables (Optional)
+- `LOG_DEBUG` Print debug level logs (default: false)
+- `LOG_INFO` Print info level logs (default: true)
+- `LOG_ERROR` Print error level logs (default: true)
+- `SERVER_PORT` Port the server uses (default: 8081)
+- `SERVER_IP` IP the server runs on (default: 0.0.0.0)
+
+### Start Service
+
+- `lein run`
+
+## Using
+
 ### Sending Basic Email
-Create a JSON file
+Create a JSON request
+curl -XPOST -H "Content-Type: application/json" "http://localhost:8081/send" -d
 ```javascript
 {
   "to": "To Email Address",
@@ -34,9 +48,12 @@ Create a JSON file
 }
 ```
 
-- `lein run -- --json JSON_FILE`
-- (Or if built)
-- `java -jar ./target/uberjar/clj-mailgun-0.1.0-SNAPSHOT-standalone.jar --json JSON_FILE`
+### Idempotent Check
+You can send any generated id to "/send/[id]" (or in the JSON) and the server will check to see if the id has already been used. (Resets when the service restarts)
+
+Any requests that do not send an id, will receive a generated uuid in the response.
+
+If a conflicting request is received, no email will be send and a 409 response code will be returned.
 
 ### Sending Templated Email
 Create [mustache style templates](https://mustache.github.io/) and put them in the resources/templates directory.
@@ -49,7 +66,7 @@ Create [mustache style templates](https://mustache.github.io/) and put them in t
   - [template name]-text.mustache
   - [template name]-html.mustache
 
-Create a JSON file
+See "Sending Basic Email" except with
 ```javascript
 {
   "to": "To Email Address",
@@ -61,8 +78,6 @@ Create a JSON file
   }
 }
 ```
-
-- `lein run -- --json JSON_FILE`
 
 Remember: It is your responsibility to include all required parameters for the template!
 

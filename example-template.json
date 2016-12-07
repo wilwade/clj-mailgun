@@ -1,8 +1,0 @@
-{"to": "to-someone@domain.com",
- "from": "from-someone@domain.com",
- "subject": "Subject",
- "template": "generic",
- "params": {
-   "title": "Title is Here",
-   "content": "Hello World!"
-   }}

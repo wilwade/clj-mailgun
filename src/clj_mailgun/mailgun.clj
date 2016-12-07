@@ -32,13 +32,22 @@
     (throw (ex-info "Unable to send message without content in text or html!" all)))
   (validate-email to)
   (validate-email from)
-  (client/post
-    (url "messages")
-    {:from from
-     :to to
-     :subject subject
-     :text text
-     :html html} {:basic-auth ["api" (:key config/mailgun)]}))
+  (let [resp @(client/post
+              (url "messages")
+              {:from from
+               :to to
+               :cc cc
+               :bcc bcc
+               :subject subject
+               :text text
+               :html html}
+               {:basic-auth ["api" (:key config/mailgun)]})]
+    (if (= 200 (:status resp))
+      (->
+        resp
+        (assoc :body (json/read-str (:body resp) :key-fn keyword))
+        (assoc :status 200))
+      resp)))
 
 (defn send-html
   [to from subject body]
